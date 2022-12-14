@@ -16,5 +16,7 @@ The newly generated address has to be used as the `recipient` of the `FtsoReward
 ## Deployments
 
 `RewardDistributorFactory`
-- Coston: [0x171eB1f854A7e542D88d6f6fb8827C83236C1937](https://coston-explorer.flare.network/address/0x171eB1f854A7e542D88d6f6fb8827C83236C1937)
-- Songbird: [0xc98fbA33De5DC14f691aa4Ad3dEA047c0C1a3886](https://songbird-explorer.flare.network/address/0xc98fbA33De5DC14f691aa4Ad3dEA047c0C1a3886)
+| Chain    | Address                                      |
+|----------| -------------------------------------------- |
+| Coston   | [0x171eB1f854A7e542D88d6f6fb8827C83236C1937](https://coston-explorer.flare.network/address/0x171eB1f854A7e542D88d6f6fb8827C83236C1937) |
+| Songbird | [0xc98fbA33De5DC14f691aa4Ad3dEA047c0C1a3886](https://songbird-explorer.flare.network/address/0xc98fbA33De5DC14f691aa4Ad3dEA047c0C1a3886) |
