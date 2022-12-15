@@ -39,27 +39,27 @@ contract RewardDistributorFactory is IRewardDistributorFactory {
         return instances[owner];
     }
 
-    function rename(address instance, string calldata description) external returns (bool) {
+    function rename(address instance, string calldata description) external {
         require(bytes(description).length > 0, "Empty description");
         NamedInstance[] storage nis = instances[msg.sender];
         for (uint256 i; i < nis.length; i++) {
             if (nis[i].instance == instance) {
                 nis[i].description = description;
-                return true;
+                return;
             }
         }
-        return false;
+        revert("Instance not found");
     }
 
-    function remove(address instance) external returns (bool) {
+    function remove(address instance) external {
         NamedInstance[] storage nis = instances[msg.sender];
         for (uint256 i; i < nis.length; i++) {
             if (nis[i].instance == instance) {
                 if (i < nis.length - 1) nis[i] = nis[nis.length - 1];
                 nis.pop();
-                return true;
+                return;
             }
         }
-        return false;
+        revert("Instance not found");
     }
 }

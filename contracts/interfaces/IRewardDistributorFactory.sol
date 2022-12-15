@@ -22,6 +22,6 @@ interface IRewardDistributorFactory {
     function count(address owner) external view returns (uint256);
     function get(address owner, uint256 i) external view returns (address instance, string memory description);
     function getAll(address owner) external view returns (NamedInstance[] memory);
-    function rename(address instance, string calldata description) external returns (bool);
-    function remove(address instance) external returns (bool);
+    function rename(address instance, string calldata description) external;
+    function remove(address instance) external;
 }
