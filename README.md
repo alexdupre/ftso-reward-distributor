@@ -10,6 +10,8 @@ The parameters to be passed are:
 - `recipients`: an array of addresses, where the provider's fee will be sent to, in different percentages
 - `bips`: an array of basis points, corresponding to the different shares for each recipient; it has to have the same length as the recipient array and the sum must be 10000 (100.00%)
 - `wrap`: an array of booleans, to specify if the corresponding fee share needs to be wrapped (for auto-delegation) or not
+- `editable`: a boolean to allow successive modification of the reserveBalance, recipients and bips
+- `description`: an optional string to identify the contract, useful for a management UI
 
 The newly generated address has to be used as the `recipient` of the `FtsoRewardManager.claimReward` function. During the fee distribution the smart contract emits specific events for each performed transfer, that can be used for accounting purposes.
 
@@ -18,5 +20,5 @@ The newly generated address has to be used as the `recipient` of the `FtsoReward
 `RewardDistributorFactory`
 | Chain    | Address                                      |
 |----------| -------------------------------------------- |
-| Coston   | [0x171eB1f854A7e542D88d6f6fb8827C83236C1937](https://coston-explorer.flare.network/address/0x171eB1f854A7e542D88d6f6fb8827C83236C1937) |
-| Songbird | [0xc98fbA33De5DC14f691aa4Ad3dEA047c0C1a3886](https://songbird-explorer.flare.network/address/0xc98fbA33De5DC14f691aa4Ad3dEA047c0C1a3886) |
+| Coston   | [0xc98fbA33De5DC14f691aa4Ad3dEA047c0C1a3886](https://coston-explorer.flare.network/address/0xc98fbA33De5DC14f691aa4Ad3dEA047c0C1a3886) |
+| Songbird | [0xc2826E4Ed912fB1EAC94c2Ce97e4111780Cd85be](https://songbird-explorer.flare.network/address/0xc2826E4Ed912fB1EAC94c2Ce97e4111780Cd85be) |
