@@ -21,4 +21,6 @@ The newly generated address has to be used as the `recipient` of the `FtsoReward
 | Chain    | Address                                      |
 |----------| -------------------------------------------- |
 | Coston   | [0xc98fbA33De5DC14f691aa4Ad3dEA047c0C1a3886](https://coston-explorer.flare.network/address/0xc98fbA33De5DC14f691aa4Ad3dEA047c0C1a3886) |
+| Coston2  | [0x171eB1f854A7e542D88d6f6fb8827C83236C1937](https://coston2-explorer.flare.network/address/0x171eB1f854A7e542D88d6f6fb8827C83236C1937) |
 | Songbird | [0xc2826E4Ed912fB1EAC94c2Ce97e4111780Cd85be](https://songbird-explorer.flare.network/address/0xc2826E4Ed912fB1EAC94c2Ce97e4111780Cd85be) |
+| Flare    | [0x171eB1f854A7e542D88d6f6fb8827C83236C1937](https://flare-explorer.flare.network/address/0x171eB1f854A7e542D88d6f6fb8827C83236C1937) |
