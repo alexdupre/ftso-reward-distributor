@@ -3,7 +3,7 @@ pragma solidity >=0.7.5;
 pragma abicoder v2;
 
 interface IRewardDistributorFactory {
-    event Created(address indexed instance, address indexed provider);
+    event Created(address indexed instance);
 
     struct NamedInstance {
         address instance;
@@ -11,8 +11,8 @@ interface IRewardDistributorFactory {
     }
 
     function create(
-        address provider,
-        uint256 reserveBalance,
+        address[] calldata providerAddresses,
+        uint256[] calldata reserveBalances,
         address[] calldata recipients,
         uint256[] calldata bips,
         bool[] calldata wrap,

@@ -1,4 +1,5 @@
 .env
-node_modules
-cache
-artifacts
+node_modules/
+cache/
+artifacts/
+ignition/deployments/

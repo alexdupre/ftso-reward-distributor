@@ -1,29 +1,32 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.17;
+pragma solidity ^0.8.27;
 
-import './interfaces/IRewardDistributorFactory.sol';
+import "./interfaces/IRewardDistributorFactory.sol";
 import "./RewardDistributor.sol";
 
 contract RewardDistributorFactory is IRewardDistributorFactory {
-
     mapping(address => NamedInstance[]) private instances;
 
     function create(
-        address provider,
-        uint256 reserveBalance,
+        address[] calldata providerAddresses,
+        uint256[] calldata reserveBalances,
         address[] calldata recipients,
         uint256[] calldata bips,
         bool[] calldata wrap,
         bool editable,
         string calldata description
     ) external returns (address instance) {
-        instance = address(new RewardDistributor(provider, reserveBalance, recipients, bips, wrap, editable ? msg.sender : address(0)));
+        instance = address(
+            new RewardDistributor(
+                providerAddresses, reserveBalances, recipients, bips, wrap, editable ? msg.sender : address(0)
+            )
+        );
         if (bytes(description).length > 0) {
             NamedInstance storage ni = instances[msg.sender].push();
             ni.instance = instance;
             ni.description = description;
         }
-        emit Created(instance, provider);
+        emit Created(instance);
     }
 
     function count(address owner) external view returns (uint256) {
