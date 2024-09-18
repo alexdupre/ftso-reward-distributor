@@ -11,8 +11,9 @@ interface IRewardDistributorFactory {
     }
 
     function create(
-        address[] calldata providerAddresses,
-        uint256[] calldata reserveBalances,
+        address[] calldata operatingAddresses,
+        uint256[] calldata lowReserves,
+        uint256[] calldata highReserves,
         address[] calldata recipients,
         uint256[] calldata bips,
         bool[] calldata wrap,

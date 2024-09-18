@@ -5,7 +5,7 @@ import "./interfaces/IRewardDistributor.sol";
 import "./FlareLibrary.sol";
 
 contract RewardDistributor is IRewardDistributor {
-    ProviderAddress[] public providerAddresses;
+    OperatingAddress[] public operatingAddresses;
     Recipient[] public recipients;
 
     address public owner;
@@ -25,29 +25,61 @@ contract RewardDistributor is IRewardDistributor {
     }
 
     constructor(
-        address[] memory _providerAddresses,
-        uint256[] memory _reserveBalances,
+        address[] memory _operatingAddresses,
+        uint256[] memory _lowReserves,
+        uint256[] memory _highReserves,
         address[] memory _recipients,
         uint256[] memory _bips,
         bool[] memory _wrap,
         address _owner
     ) {
-        uint256 len = _providerAddresses.length;
-        require(len > 0, "No provider address");
-        require(_reserveBalances.length == len, "Reserve balances length mismatch");
+        uint256 len = _operatingAddresses.length;
+        require(_lowReserves.length == len, "Low reserves length mismatch");
+        require(_highReserves.length == len, "High reserves length mismatch");
         len = _recipients.length;
+        require(len > 0, "No recipients");
         require(_bips.length == len, "Bips length mismatch");
         require(_wrap.length == len, "Wrap length mismatch");
         owner = _owner;
-        addProviderAddresses(_providerAddresses, _reserveBalances);
+        addOperatingAddresses(_operatingAddresses, _lowReserves, _highReserves);
         addRecipients(_recipients, _bips, _wrap);
     }
 
-    function addProviderAddresses(address[] memory _recipients, uint256[] memory _reserves) private {
+    function addOperatingAddresses(address[] memory _recipients, uint256[] memory _lowReserves, uint256[] memory _highReserves) private {
         for (uint256 i; i < _recipients.length; i++) {
-            ProviderAddress storage providerAddress = providerAddresses.push();
-            providerAddress.recipient = payable(_recipients[i]);
-            providerAddress.reserve = _reserves[i];
+            addOperatingAddress(_recipients[i], _lowReserves[i], _highReserves[i]);
+        }
+    }
+
+    function addOperatingAddress(address _recipient, uint256 _lowReserve, uint256 _highReserve) internal {
+        require(_highReserve >= _lowReserve, "High/Low reserves inconsistency");
+        OperatingAddress storage operatingAddress = operatingAddresses.push();
+        operatingAddress.recipient = payable(_recipient);
+        operatingAddress.lowReserve = _lowReserve;
+        operatingAddress.highReserve = _highReserve;
+    }
+
+    function addOrReplaceOperatingAddress(address _recipient, uint256 _lowReserve, uint256 _highReserve) external onlyOwner {
+        require(_highReserve >= _lowReserve, "High/Low reserves inconsistency");
+        for (uint256 i; i < operatingAddresses.length; i++) {
+            OperatingAddress storage operatingAddress = operatingAddresses[i];
+            if (operatingAddress.recipient == _recipient) {
+                operatingAddress.lowReserve = _lowReserve;
+                operatingAddress.highReserve = _highReserve;
+                return;
+            }
+        }
+        addOperatingAddress(_recipient, _lowReserve, _highReserve);
+    }
+
+    function removeOperatingAddress(address _recipient) external onlyOwner {
+        for (uint256 i; i < operatingAddresses.length; i++) {
+            OperatingAddress storage operatingAddress = operatingAddresses[i];
+            if (operatingAddress.recipient == _recipient) {
+                if (i < operatingAddresses.length - 1) operatingAddress = operatingAddresses[operatingAddresses.length - 1];
+                operatingAddresses.pop();
+                return;
+            }
         }
     }
 
@@ -63,12 +95,12 @@ contract RewardDistributor is IRewardDistributor {
         require(total == 100_00, "Sum is not 100%");
     }
 
-    function providerAddressesCount() external view returns (uint256) {
-        return providerAddresses.length;
+    function operatingAddressesCount() external view returns (uint256) {
+        return operatingAddresses.length;
     }
 
-    function providerAddressesAll() external view returns (ProviderAddress[] memory) {
-        return providerAddresses;
+    function operatingAddressesAll() external view returns (OperatingAddress[] memory) {
+        return operatingAddresses;
     }
 
     function recipientsCount() external view returns (uint256) {
@@ -82,15 +114,15 @@ contract RewardDistributor is IRewardDistributor {
     receive() external payable lock {
         uint256 remainingAmount = msg.value;
         emit TotalRewards(block.timestamp, remainingAmount);
-        for (uint256 i; i < providerAddresses.length && remainingAmount > 0; i++) {
-            ProviderAddress storage p = providerAddresses[i];
-            uint256 currentBalance = p.recipient.balance;
-            if (currentBalance < p.reserve) {
-                uint256 refillAmount = p.reserve - currentBalance;
+        for (uint256 i; i < operatingAddresses.length && remainingAmount > 0; i++) {
+            OperatingAddress storage o = operatingAddresses[i];
+            uint256 currentBalance = o.recipient.balance;
+            if (currentBalance < o.lowReserve) {
+                uint256 refillAmount = o.highReserve - currentBalance;
                 if (refillAmount > remainingAmount) refillAmount = remainingAmount;
-                (bool success,) = p.recipient.call{value: refillAmount}("");
-                require(success, "Unable to refill provider's account");
-                emit Refill(p.recipient, refillAmount);
+                (bool success,) = o.recipient.call{value: refillAmount}("");
+                require(success, "Unable to refill operating's account");
+                emit Refill(o.recipient, refillAmount);
                 remainingAmount -= refillAmount;
             }
         }
@@ -121,22 +153,17 @@ contract RewardDistributor is IRewardDistributor {
         selfdestruct(payable(owner));
     }
 
-    function replaceProviderAddresses(address[] calldata _recipients, uint256[] calldata _reserves)
-        external
-        onlyOwner
-    {
-        require(providerAddresses.length > 0, "No provider address");
-        for (uint256 i = providerAddresses.length; i > 0; i--) {
-            providerAddresses.pop();
+    function replaceOperatingAddresses(address[] calldata _recipients, uint256[] calldata _lowReserves, uint256[] calldata _highReserves) external onlyOwner {
+        for (uint256 i = operatingAddresses.length; i > 0; i--) {
+            operatingAddresses.pop();
         }
-        addProviderAddresses(_recipients, _reserves);
+        addOperatingAddresses(_recipients, _lowReserves, _highReserves);
     }
 
-    function replaceRecipients(address[] calldata _recipients, uint256[] calldata _bips, bool[] calldata _wrap)
-        external
-        onlyOwner
-    {
-        for (uint256 i = recipients.length; i > 0; i--) {
+    function replaceRecipients(address[] calldata _recipients, uint256[] calldata _bips, bool[] calldata _wrap) external onlyOwner {
+        uint256 len = recipients.length;
+        require(len > 0, "No recipients");
+        for (uint256 i = len; i > 0; i--) {
             recipients.pop();
         }
         addRecipients(_recipients, _bips, _wrap);

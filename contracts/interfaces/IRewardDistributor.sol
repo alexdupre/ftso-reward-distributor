@@ -7,9 +7,10 @@ interface IRewardDistributor {
     event Reward(address indexed recipient, uint256 amount);
     event Refill(address indexed recipient, uint256 amount);
 
-    struct ProviderAddress {
+    struct OperatingAddress {
         address payable recipient;
-        uint256 reserve;
+        uint256 lowReserve;
+        uint256 highReserve;
     }
 
     struct Recipient {
@@ -18,9 +19,9 @@ interface IRewardDistributor {
         bool wrap;
     }
 
-    function providerAddresses(uint256 i) external view returns (address payable recipient, uint256 reserve);
-    function providerAddressesCount() external view returns (uint256);
-    function providerAddressesAll() external view returns (ProviderAddress[] memory);
+    function operatingAddresses(uint256 i) external view returns (address payable recipient, uint256 lowReserve, uint256 highReserve);
+    function operatingAddressesCount() external view returns (uint256);
+    function operatingAddressesAll() external view returns (OperatingAddress[] memory);
 
     function recipients(uint256 i) external view returns (address recipient, uint256 bips, bool wrap);
     function recipientsCount() external view returns (uint256);
@@ -31,7 +32,8 @@ interface IRewardDistributor {
     function replaceOwner(address _owner) external;
     function destroy() external;
 
-    function replaceProviderAddresses(address[] calldata _recipients, uint256[] calldata _reserve) external;
-    function replaceRecipients(address[] calldata _recipients, uint256[] calldata _bips, bool[] calldata _wrap)
-        external;
+    function addOrReplaceOperatingAddress(address _recipient, uint256 _lowReserve, uint256 _highReserve) external;
+    function removeOperatingAddress(address _recipient) external;
+    function replaceOperatingAddresses(address[] calldata _recipients, uint256[] calldata _lowReserves, uint256[] calldata _highReserves) external;
+    function replaceRecipients(address[] calldata _recipients, uint256[] calldata _bips, bool[] calldata _wrap) external;
 }

@@ -8,8 +8,9 @@ contract RewardDistributorFactory is IRewardDistributorFactory {
     mapping(address => NamedInstance[]) private instances;
 
     function create(
-        address[] calldata providerAddresses,
-        uint256[] calldata reserveBalances,
+        address[] calldata operatingAddresses,
+        uint256[] calldata lowReserves,
+        uint256[] calldata highReserves,
         address[] calldata recipients,
         uint256[] calldata bips,
         bool[] calldata wrap,
@@ -18,7 +19,7 @@ contract RewardDistributorFactory is IRewardDistributorFactory {
     ) external returns (address instance) {
         instance = address(
             new RewardDistributor(
-                providerAddresses, reserveBalances, recipients, bips, wrap, editable ? msg.sender : address(0)
+                operatingAddresses, lowReserves, highReserves, recipients, bips, wrap, editable ? msg.sender : address(0)
             )
         );
         if (bytes(description).length > 0) {
